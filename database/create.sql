@@ -1,4 +1,4 @@
-drop schema tests cascade;
+drop schema if exists tests cascade;
 create schema tests;
 
 create table tests.enrollment (
@@ -8,7 +8,7 @@ create table tests.enrollment (
 	average numeric
 );
 
-create table tests.grade (
+create  table tests.grade (
 	id_grade integer,
 	id_enrollment integer,
 	exam_code text,
