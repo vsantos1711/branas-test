@@ -1,5 +1,6 @@
 import express, { Response, Request } from "express";
-import pgp from "pg-promise";
+import CalculateAverage from "./application/usecase/calculate-average";
+import GetEnrollment from "./application/usecase/get-enrollments";
 
 const app = express();
 app.use(express.json());
@@ -7,22 +8,9 @@ app.use(express.json());
 app.post(
   "/enrollments/:idEnrollment/calculate-average",
   async function (request: Request, response: Response) {
-    const connection = pgp()("postgres://user:pass@postgres:5432/testdatabase");
-    const gradesData = await connection.query(
-      "SELECT * FROM tests.grade WHERE id_enrollment = $1",
-      [request.params.idEnrollment]
-    );
-
-    let total = 0;
-    for (const grade of gradesData) {
-      total += parseFloat(grade.value);
-    }
-    const average = total / gradesData.length;
-    await connection.query(
-      "UPDATE tests.enrollment SET average = $1 WHERE id_enrollment = $2",
-      [average, request.params.idEnrollment]
-    );
-    connection.$pool.end();
+    const input = { idEnrollment: parseInt(request.params.idEnrollment) };
+    const calculateAverage = new CalculateAverage();
+    await calculateAverage.execute(input);
     response.end();
   }
 );
@@ -30,17 +18,10 @@ app.post(
 app.get(
   "/enrollments/:idEnrollment",
   async function (request: Request, response: Response) {
-    const connection = pgp()("postgres://user:pass@postgres:5432/testdatabase");
-
-    const [enrollmentData] = await connection.query(
-      "SELECT * FROM tests.enrollment WHERE id_enrollment = $1",
-      [request.params.idEnrollment]
-    );
-
-    const average = parseFloat(enrollmentData.average);
-    response.json({
-      average,
-    });
+    const input = { idEnrollment: parseInt(request.params.idEnrollment) };
+    const getEnrollment = new GetEnrollment();
+    const output = await getEnrollment.execute(input);
+    response.json({ average: output.average });
   }
 );
 
