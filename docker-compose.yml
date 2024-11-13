@@ -6,9 +6,8 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: testdatabase
-      POSTGRES_INITDB_ARGS: "--auth-local=md5 --auth-host=md5"
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - ./database:/docker-entrypoint-initdb.d
   express-app:
@@ -23,4 +22,4 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgres://user:pass@postgres:5432/testdatabase
+      DATABASE_URL: postgres://user:pass@localhost:5432/testdatabase
